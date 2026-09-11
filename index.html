@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#8b5a2b">
+<meta name="apple-mobile-web-app-title" content="Marcenaria">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<title>Marcenaria — Orçamento & Corte V2.1</title>
+<style>
+:root{
+  --primary:#8b5a2b; --primary-dark:#6b4423; --accent:#d97706;
+  --bg:#f7f3ee; --card:#ffffff; --text:#2b2118; --muted:#7a6f63;
+  --danger:#b91c1c; --danger-bg:#fef2f2; --ok:#166534; --border:#e2d8cb; --radius:12px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;-webkit-text-size-adjust:100%;}
+body{padding-bottom:70px;}
+h1,h2,h3{margin:0 0 8px 0;}
+h2{font-size:17px;margin-top:18px;color:var(--primary-dark);}
+h3{font-size:14px;}
+p{margin:6px 0;}
+button{font-family:inherit;cursor:pointer;}
+input,select,textarea{font-family:inherit;font-size:16px;}
+
+#topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:8px;background:var(--primary);color:#fff;padding:12px 10px;padding-top:calc(12px + env(safe-area-inset-top));}
+#topbar h1{flex:1;font-size:17px;text-align:center;}
+.icon-btn{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:8px 12px;font-size:15px;}
+.icon-btn:active{background:rgba(255,255,255,.3);}
+
+.view{padding:12px;max-width:640px;margin:0 auto;}
+.card-list{display:flex;flex-direction:column;gap:10px;margin:10px 0;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+.card-main{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0;}
+.card-main strong{font-size:15px;}
+.card-main span{font-size:13px;color:var(--muted);}
+.card-main .price{color:var(--primary-dark);font-weight:700;font-size:15px;}
+.card-main .tag{display:inline-block;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:2px 6px;font-size:11px;width:fit-content;}
+.card-main .obs{font-style:italic;font-size:12px;}
+.card-actions{display:flex;gap:6px;flex-shrink:0;}
+.card-actions button{background:var(--bg);border:1px solid var(--border);border-radius:8px;width:38px;height:38px;font-size:16px;}
+.empty{color:var(--muted);text-align:center;padding:20px 10px;font-size:14px;}
+
+.btn{border:none;border-radius:var(--radius);padding:14px 16px;font-size:15px;font-weight:600;min-height:48px;}
+.btn-block{width:100%;display:block;margin:8px 0;}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:active{background:var(--primary-dark);}
+.btn-secondary{background:#fff;color:var(--primary-dark);border:1px solid var(--primary);}
+.btn-secondary:active{background:var(--bg);}
+.btn-danger{background:#fff;color:var(--danger);border:1px solid var(--danger);}
+
+.stats-row{display:flex;gap:8px;margin:12px 0;}
+.stat-card{flex:1;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center;}
+.stat-card span{display:block;font-size:20px;font-weight:700;color:var(--primary-dark);}
+.stat-card small{font-size:11px;color:var(--muted);}
+.dashboard-actions{display:flex;flex-direction:column;gap:8px;margin-top:20px;}
+
+.form-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:14px;}
+.form-card label{display:block;font-size:13px;color:var(--muted);margin-bottom:10px;font-weight:600;}
+.form-card label input,.form-card label select,.form-card label textarea{width:100%;margin-top:4px;padding:10px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--text);font-weight:400;}
+.form-card label textarea{min-height:60px;resize:vertical;}
+.row2{display:flex;gap:10px;}
+.row2 label{flex:1;min-width:0;}
+.field-check{display:flex;align-items:center;gap:8px;font-weight:600;font-size:13px;color:var(--text);}
+.field-check input{width:18px;height:18px;}
+.switch-group{display:flex;gap:8px;margin-bottom:12px;}
+.chip{flex:1;padding:10px;border-radius:8px;border:1px solid var(--primary);background:#fff;color:var(--primary-dark);font-weight:600;font-size:13px;}
+.chip.active{background:var(--primary);color:#fff;}
+
+.info-box{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin:10px 0;font-size:13px;}
+.info-box.highlight{background:#fff7ed;border-color:var(--accent);font-size:15px;}
+.alert{background:var(--danger-bg);color:var(--danger);border:1px solid #fecaca;border-radius:10px;padding:10px 12px;font-size:13px;margin:8px 0;}
+
+.resumo-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;}
+.resumo-line{display:flex;justify-content:space-between;padding:6px 0;font-size:14px;}
+.resumo-line.total{font-weight:700;font-size:16px;}
+.resumo-sub{font-size:12px;color:var(--muted);margin:-2px 0 8px 0;}
+.preco-venda-box{background:var(--primary);color:#fff;border-radius:10px;padding:16px;margin:14px 0;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.preco-venda-box span{font-size:13px;letter-spacing:1px;}
+.preco-venda-box strong{font-size:28px;}
+
+.sheet-block{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:10px;margin:14px 0;}
+.sheet-block h3{color:var(--primary-dark);}
+.sheet-block h3 small{color:var(--muted);font-weight:400;margin-left:6px;}
+.sheet-visual{position:relative;width:100%;background:#faf7f2;border:2px solid #3a2f22;border-radius:4px;overflow:hidden;}
+.sheet-margin-line{position:absolute;border:1px dashed #b5a998;pointer-events:none;}
+.peca-box{position:absolute;border:1px solid #3a2f22;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;padding:1px;font-size:10px;line-height:1.2;}
+.peca-box .peca-nome{font-weight:700;}
+.peca-box .peca-dim,.peca-box .peca-cod{font-size:9px;opacity:.8;}
+.sobra-info{font-size:12px;color:var(--muted);margin-top:6px;}
+
+#bottomnav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#fff;border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom);display:none;}
+#bottomnav.flex-show{display:flex;}
+.navbtn{flex:1;border:none;background:none;padding:8px 2px;font-size:11px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px;}
+.navbtn span{font-size:19px;}
+.navbtn.active{color:var(--primary);font-weight:700;}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;display:flex;align-items:flex-end;justify-content:center;}
+.modal-box{background:#fff;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;border-radius:16px 16px 0 0;padding:18px;padding-bottom:calc(18px + env(safe-area-inset-bottom));}
+.modal-form label{display:block;font-size:13px;color:var(--muted);font-weight:600;margin-bottom:10px;}
+.modal-form input,.modal-form select,.modal-form textarea{width:100%;margin-top:4px;padding:10px;border:1px solid var(--border);border-radius:8px;font-weight:400;color:var(--text);}
+.modal-form textarea{min-height:60px;}
+.modal-actions{display:flex;gap:10px;margin-top:10px;}
+.modal-actions .btn{flex:1;margin:0;}
+.export-textarea{width:100%;min-height:180px;font-family:monospace;font-size:12px;padding:8px;border:1px solid var(--border);border-radius:8px;}
+
+#toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%) translateY(20px);background:#2b2118;color:#fff;padding:10px 18px;border-radius:30px;font-size:13px;opacity:0;pointer-events:none;transition:all .25s;z-index:200;max-width:90%;text-align:center;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+#toast.error{background:var(--danger);}
+
+#print-area{display:none;}
+.print-row{display:flex;justify-content:space-between;font-size:13px;margin:4px 0;}
+.print-table{width:100%;border-collapse:collapse;margin:8px 0;font-size:13px;}
+.print-table th,.print-table td{border:1px solid #999;padding:6px 8px;text-align:left;}
+.print-total.destaque{background:#f2e9de;padding:8px;border-radius:6px;}
+
+@media print{
+  #topbar,#bottomnav,#view-dashboard,#view-project,#view-catalogo,#modal-root,#toast{display:none !important;}
+  #print-area{display:block !important;padding:10px;color:#000;background:#fff;}
+  body{padding-bottom:0;background:#fff;}
+}
+</style>
+</head>
+<body>
+
+<header id="topbar">
+  <button id="btnBack" class="icon-btn" data-action="voltar" style="display:none">←</button>
+  <h1 id="topTitle">🪚 Marcenaria</h1>
+  <button id="btnSave" class="icon-btn" data-action="salvar-projeto" style="display:none">💾</button>
+</header>
+
+<div id="install-info" class="info-box" style="margin:12px;display:none">
+  <strong>🪚 Marcenaria V2.1 — modo offline</strong>
+  <p>Para ter o melhor funcionamento no iPhone, abra este sistema pelo ícone instalado na Tela de Início.</p>
+</div>
+
+<main id="view-dashboard" class="view">
+  <button class="btn btn-primary btn-block" data-action="novo-orcamento">+ NOVO ORÇAMENTO</button>
+  <div class="stats-row">
+    <div class="stat-card"><span id="statOrcamentos">0</span><small>Orçamentos</small></div>
+    <div class="stat-card"><span id="statClientes">0</span><small>Clientes</small></div>
+    <div class="stat-card"><span id="statUltimo">-</span><small>Último orçamento</small></div>
+  </div>
+  <h2>Projetos recentes</h2>
+  <div id="listaProjetos" class="card-list"></div>
+  <div class="dashboard-actions">
+    <button class="btn btn-secondary" data-action="carregar-exemplo">📋 Carregar exemplo</button>
+    <button class="btn btn-secondary" data-action="ir-catalogo">🗄️ Catálogo de materiais e preços</button>
+  </div>
+</main>
+
+<main id="view-project" class="view" style="display:none">
+  <section id="tab-orcamento" class="tab-content"></section>
+  <section id="tab-materiais" class="tab-content" style="display:none"></section>
+  <section id="tab-pecas" class="tab-content" style="display:none"></section>
+  <section id="tab-corte" class="tab-content" style="display:none"></section>
+  <section id="tab-resumo" class="tab-content" style="display:none"></section>
+</main>
+
+<main id="view-catalogo" class="view" style="display:none"></main>
+
+<nav id="bottomnav">
+  <button class="navbtn" data-action="switch-tab" data-tab="orcamento"><span>📝</span>Orçamento</button>
+  <button class="navbtn" data-action="switch-tab" data-tab="materiais"><span>🪵</span>Materiais</button>
+  <button class="navbtn" data-action="switch-tab" data-tab="pecas"><span>📐</span>Peças</button>
+  <button class="navbtn" data-action="switch-tab" data-tab="corte"><span>✂️</span>Corte</button>
+  <button class="navbtn" data-action="switch-tab" data-tab="resumo"><span>💰</span>Resumo</button>
+</nav>
+
+<div id="modal-root"></div>
+<div id="toast"></div>
+<div id="print-area"></div>
+
+<script>
+/* ===================== ESTADO GLOBAL ===================== */
+let DB = { chapas:[], precos:[], projetos:[], config:{ valorHoraPadrao:25 } };
+let currentView = 'dashboard';
+let currentProjectId = null;
+let currentTab = 'orcamento';
+let catalogOrigemProjectId = null;
+let storageAvailable = true;
+let storageWarned = false;
+
+/* ===================== ARMAZENAMENTO ===================== */
+function loadDB(){
+  try{
+    const raw = localStorage.getItem('marcenariaDB_v21');
+    if(raw){
+      const parsed = JSON.parse(raw);
+      DB = Object.assign({chapas:[],precos:[],projetos:[],config:{valorHoraPadrao:25}}, parsed);
+    } else { seedDB(); }
+  }catch(e){
+    storageAvailable = false;
+    seedDB();
+    setTimeout(()=>{
+      toast('Aviso: não foi possível usar o armazenamento local. O orçamento poderá não persistir neste ambiente.', 'error');
+    }, 500);
+  }
+}
+function saveDB(){
+  try{ localStorage.setItem('marcenariaDB_v21', JSON.stringify(DB)); }
+  catch(e){
+    storageAvailable = false;
+    if(!storageWarned){ storageWarned = true; toast('Não foi possível salvar neste ambiente. Verifique se o app foi instalado pela Tela de Início do iPhone.', 'error'); }
+  }
+}
+function seedDB(){
+  DB.chapas = [
+    { id:uid(), nome:'MDF Branco 15mm', largura:1850, comprimento:2750, espessura:15, preco:185, kerf:3.2, margem:5, qtdDisponivel:'' },
+    { id:uid(), nome:'MDF Branco 18mm', largura:1850, comprimento:2750, espessura:18, preco:215, kerf:3.2, margem:5, qtdDisponivel:'' }
+  ];
+  DB.precos = [
+    { id:uid(), nome:'Fita de borda 22mm', preco:1.8, unidade:'m', tipo:'fita' },
+    { id:uid(), nome:'Dobradiça', preco:7.5, unidade:'un', tipo:'ferragem' },
+    { id:uid(), nome:'Parafuso', preco:0.35, unidade:'un', tipo:'ferragem' }
+  ];
+  DB.projetos = [];
+  DB.config = { valorHoraPadrao:25 };
+  saveDB();
+}
+
+/* ===================== UTILITÁRIOS ===================== */
+function uid(){ return 'id'+Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtMoney(v){ return 'R$ ' + (Number(v)||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtDate(iso){ if(!iso) return '-'; const p=iso.split('-'); return p.length===3? p[2]+'/'+p[1]+'/'+p[0] : iso; }
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+function slug(s){ return String(s||'orcamento').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
+function setPath(obj, path, value){ const parts=path.split('.'); let o=obj; for(let i=0;i<parts.length-1;i++){ o=o[parts[i]]; } o[parts[parts.length-1]]=value; }
+function toast(msg, type){ const t=document.getElementById('toast'); t.textContent=msg; t.className='show'+(type==='error'?' error':''); clearTimeout(t._timer); t._timer=setTimeout(()=>{t.className='';}, 3500); }
+function pieceColor(nome){
+  const palette=['#fde68a','#bfdbfe','#bbf7d0','#fbcfe8','#fcd34d','#c7d2fe','#a7f3d0','#fecaca','#e9d5ff','#fed7aa'];
+  let hash=0; for(const c of String(nome)) hash=(hash*31+c.charCodeAt(0))>>>0;
+  return palette[hash%palette.length];
+}
+
+/* ===================== CONFIRMAÇÃO PRÓPRIA (substitui confirm()) ===================== */
+function showConfirm(message, onYes, opts){
+  opts = opts || {};
+  const root = document.getElementById('modal-root');
+  root.innerHTML = `<div class="modal-overlay" data-action="fechar-modal">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h3>${esc(opts.title||'Confirmar ação')}</h3>
+      <p>${esc(message)}</p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" data-action="fechar-modal">Cancelar</button>
+        <button class="btn ${opts.danger===false?'btn-primary':'btn-danger'}" id="confirmYesBtn">${esc(opts.confirmLabel||'Confirmar')}</button>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('confirmYesBtn').onclick = ()=>{ closeModal(); onYes(); };
+}
+
+/* ===================== PROJETOS ===================== */
+function novoProjeto(){
+  const p = {
+    id:uid(), cliente:'', projetoNome:'Novo Orçamento', data:todayISO(), prazo:'', observacoes:'',
+    chapaId: DB.chapas[0] ? DB.chapas[0].id : null,
+    pecas:[], materiaisExtras:[],
+    maoDeObra:{ modo:'fixo', valorFixo:0, valorHora:DB.config.valorHoraPadrao||0, horasProjeto:0, horasCorte:0, horasMontagem:0, horasInstalacao:0 },
+    custosAdicionais:{ transporte:0, instalacao:0, outros:0 },
+    perdaPercentual:5,
+    precificacao:{ metodo:'margem', margem:30, multiplicador:1.5, arredondamento:'nao' },
+    corteResultado:null,
+    criadoEm:Date.now(), atualizadoEm:Date.now()
+  };
+  DB.projetos.push(p); saveDB(); return p;
+}
+function getProjeto(id){ return DB.projetos.find(p=>p.id===id); }
+function salvarProjetoAtual(){
+  const p=getProjeto(currentProjectId);
+  if(!p){ toast('Nenhum orçamento aberto para salvar.', 'error'); return; }
+  p.atualizadoEm=Date.now();
+  saveDB();
+  if(storageAvailable) toast('Orçamento salvo!'); else toast('Salvo apenas nesta sessão (armazenamento indisponível). Instale o app pela Tela de Início do iPhone.', 'error');
+  renderTopbar();
+}
+function excluirProjeto(id){ DB.projetos = DB.projetos.filter(p=>p.id!==id); saveDB(); renderDashboard(); toast('Orçamento excluído.'); }
+function duplicarProjeto(id){
+  const orig=getProjeto(id); if(!orig) return;
+  const copy=JSON.parse(JSON.stringify(orig));
+  copy.id=uid(); copy.projetoNome=orig.projetoNome+' (cópia)'; copy.criadoEm=Date.now(); copy.atualizadoEm=Date.now();
+  DB.projetos.push(copy); saveDB(); renderDashboard(); toast('Orçamento duplicado!');
+}
+
+/* ===================== CÁLCULO GERAL DO ORÇAMENTO ===================== */
+function calcularOrcamento(p){
+  const chapa = DB.chapas.find(c=>c.id===p.chapaId);
+  let custoMDF=0, sheetsUsed=0, aproveitamento=0;
+  if(chapa && p.corteResultado){
+    sheetsUsed = p.corteResultado.sheets.length;
+    custoMDF = sheetsUsed * (Number(chapa.preco)||0) * (1 + (Number(p.perdaPercentual)||0)/100);
+    aproveitamento = p.corteResultado.aproveitamento;
+  }
+  const materiaisExtrasTotal = (p.materiaisExtras||[]).reduce((s,i)=> s + (Number(i.precoUnit)||0)*(Number(i.quantidade)||0), 0);
+  const materiaisTotal = custoMDF + materiaisExtrasTotal;
+  let maoObraTotal = 0;
+  if(p.maoDeObra.modo==='fixo'){ maoObraTotal = Number(p.maoDeObra.valorFixo)||0; }
+  else {
+    const horas = (Number(p.maoDeObra.horasProjeto)||0) + (Number(p.maoDeObra.horasCorte)||0) + (Number(p.maoDeObra.horasMontagem)||0) + (Number(p.maoDeObra.horasInstalacao)||0);
+    maoObraTotal = horas * (Number(p.maoDeObra.valorHora)||0);
+  }
+  const custosAdic = (Number(p.custosAdicionais.transporte)||0) + (Number(p.custosAdicionais.instalacao)||0) + (Number(p.custosAdicionais.outros)||0);
+  const custoTotal = materiaisTotal + maoObraTotal + custosAdic;
+  let precoVenda = 0;
+  if(p.precificacao.metodo==='margem'){
+    let m = Number(p.precificacao.margem)||0;
+    if(m>=100) m=99; if(m<0) m=0;
+    precoVenda = custoTotal/(1-(m/100));
+  } else { precoVenda = custoTotal * (Number(p.precificacao.multiplicador)||1); }
+  let precoFinal = precoVenda;
+  if(p.precificacao.arredondamento==='cima') precoFinal = Math.ceil(precoVenda/50)*50;
+  const lucro = precoFinal - custoTotal;
+  return { chapa, sheetsUsed, custoMDF, materiaisExtrasTotal, materiaisTotal, maoObraTotal, custosAdic, custoTotal, precoVenda, precoFinal, lucro, aproveitamento };
+}
+function gerarAlertas(p, totals){
+  const alertas = [];
+  if(!totals.chapa) alertas.push('Nenhuma chapa de MDF foi selecionada para este orçamento.');
+  if(!p.pecas.length) alertas.push('Nenhuma peça foi cadastrada.');
+  if(p.pecas.length && !p.corteResultado) alertas.push('Calcule o plano de corte (aba Corte) para incluir o custo do MDF no orçamento.');
+  p.pecas.forEach(pc=>{
+    if(!pc.largura || !pc.comprimento || pc.largura<=0 || pc.comprimento<=0) alertas.push('A peça "'+pc.nome+'" está sem dimensão válida.');
+    if(!pc.quantidade || pc.quantidade<=0) alertas.push('A peça "'+pc.nome+'" tem quantidade inválida.');
+  });
+  if(p.corteResultado && p.corteResultado.naoCabem && p.corteResultado.naoCabem.length){
+    const nomes = [...new Set(p.corteResultado.naoCabem.map(i=>i.nome))].join(', ');
+    alertas.push('As peças a seguir não cabem na chapa selecionada: '+nomes+'.');
+  }
+  if(totals.custoTotal>0 && totals.precoFinal < totals.custoTotal) alertas.push('O preço de venda está ABAIXO do custo total!');
+  if(totals.precoFinal>0){
+    const margemReal = (totals.lucro/totals.precoFinal)*100;
+    if(margemReal>=0 && margemReal<10) alertas.push('A margem de lucro está muito baixa (menos de 10%).');
+  }
+  return alertas;
+}
+
+/* ===================== OTIMIZAÇÃO DE CORTE ===================== */
+function buildItemsList(pecas){
+  let items = [];
+  pecas.forEach(pc=>{
+    const qtd = Number(pc.quantidade)||0;
+    for(let i=0;i<qtd;i++){ items.push({ pieceId:pc.id, codigo:pc.codigo, nome:pc.nome, w:Number(pc.largura), h:Number(pc.comprimento), podeGirar: !!pc.podeGirar }); }
+  });
+  return items;
+}
+function packItemsOnSheets(items, chapa){
+  const kerf = Number(chapa.kerf)||0;
+  const margem = Number(chapa.margem)||0;
+  const usableW = chapa.largura - 2*margem;
+  const usableH = chapa.comprimento - 2*margem;
+  const naoCabem = [], validItems = [];
+  items.forEach(it=>{
+    const fitsNormal = it.w<=usableW && it.h<=usableH;
+    const fitsRot = it.podeGirar && it.h<=usableW && it.w<=usableH;
+    if(!fitsNormal && !fitsRot) naoCabem.push(it); else validItems.push(it);
+  });
+  const sheets = [];
+  function place(shelf, sheet, item, w, h, rotated){
+    const x = shelf.usedWidth + (shelf.usedWidth>0 ? kerf : 0);
+    shelf.usedWidth = x + w;
+    sheet.placements.push({ ...item, x, y:shelf.y, w, h, rotated });
+  }
+  function tryPlaceOnSheet(sheet, item){
+    for(const shelf of sheet.shelves){
+      const remW = usableW - shelf.usedWidth - (shelf.usedWidth>0 ? kerf : 0);
+      if(item.w<=remW && item.h<=shelf.height){ place(shelf, sheet, item, item.w, item.h, false); return true; }
+      if(item.podeGirar && item.h<=remW && item.w<=shelf.height){ place(shelf, sheet, item, item.h, item.w, true); return true; }
+    }
+    const last = sheet.shelves[sheet.shelves.length-1];
+    const newY = last ? (last.y+last.height+kerf) : 0;
+    if(item.h <= usableH-newY && item.w<=usableW){
+      const shelf={y:newY,height:item.h,usedWidth:0}; sheet.shelves.push(shelf);
+      place(shelf, sheet, item, item.w, item.h, false); return true;
+    }
+    if(item.podeGirar && item.w<=usableH-newY && item.h<=usableW){
+      const shelf={y:newY,height:item.w,usedWidth:0}; sheet.shelves.push(shelf);
+      place(shelf, sheet, item, item.h, item.w, true); return true;
+    }
+    return false;
+  }
+  validItems.forEach(item=>{
+    let placed=false;
+    for(const sheet of sheets){ if(tryPlaceOnSheet(sheet,item)){ placed=true; break; } }
+    if(!placed){ const novaSheet={shelves:[], placements:[]}; sheets.push(novaSheet); tryPlaceOnSheet(novaSheet, item); }
+  });
+  let areaTotal=0;
+  sheets.forEach(s=> s.placements.forEach(pl=> areaTotal += pl.w*pl.h));
+  const areaChapas = sheets.length * chapa.largura * chapa.comprimento;
+  const aproveitamento = areaChapas>0 ? (areaTotal/areaChapas*100) : 0;
+  return { sheets, naoCabem, aproveitamento, usableW, usableH };
+}
+function packPieces(pecas, chapa){
+  const baseItems = buildItemsList(pecas);
+  const orders = [
+    (a,b)=> (Math.max(b.w,b.h)-Math.max(a.w,a.h)) || (b.w*b.h-a.w*a.h),
+    (a,b)=> (b.h-a.h) || (b.w-a.w),
+    (a,b)=> (b.w-a.w) || (b.h-a.h),
+    (a,b)=> (b.w*b.h - a.w*a.h)
+  ];
+  let best = null;
+  orders.forEach(cmp=>{
+    const items = baseItems.slice().sort(cmp);
+    const result = packItemsOnSheets(items, chapa);
+    if(!best || result.sheets.length < best.sheets.length || (result.sheets.length===best.sheets.length && result.aproveitamento>best.aproveitamento)){ best = result; }
+  });
+  return best || { sheets:[], naoCabem:[], aproveitamento:0 };
+}
+function calcSobra(sheet, chapa){
+  const margem = Number(chapa.margem)||0;
+  const usableW = chapa.largura-2*margem;
+  const usableH = chapa.comprimento-2*margem;
+  const lastShelf = sheet.shelves[sheet.shelves.length-1];
+  const bottomY = lastShelf ? (lastShelf.y+lastShelf.height) : 0;
+  let candidates = [ {w:usableW, h:usableH-bottomY} ];
+  sheet.shelves.forEach(sh=> candidates.push({ w: usableW-sh.usedWidth, h: sh.height }) );
+  let best = candidates[0];
+  candidates.forEach(c=>{ if(c.w*c.h > best.w*best.h) best=c; });
+  const aproveitavel = (best.w>150 && best.h>150) && (best.w*best.h > 0.03*usableW*usableH);
+  return { w:Math.max(best.w,0), h:Math.max(best.h,0), aproveitavel };
+}
+function calcularECorte(){
+  const p = getProjeto(currentProjectId);
+  const chapa = DB.chapas.find(c=>c.id===p.chapaId);
+  if(!chapa){ toast('Selecione uma chapa de MDF na aba Materiais.', 'error'); return; }
+  if(!p.pecas.length){ toast('Cadastre ao menos uma peça antes de calcular.', 'error'); return; }
+  for(const pc of p.pecas){
+    if(!pc.largura || !pc.comprimento || pc.largura<=0 || pc.comprimento<=0){ toast('A peça "'+pc.nome+'" tem dimensão inválida.', 'error'); return; }
+    if(!pc.quantidade || pc.quantidade<=0){ toast('A peça "'+pc.nome+'" tem quantidade inválida.', 'error'); return; }
+  }
+  p.corteResultado = packPieces(p.pecas, chapa);
+  p.atualizadoEm = Date.now();
+  saveDB();
+  renderTab('corte');
+  toast('Plano de corte calculado!');
+}
+
+/* ===================== NAVEGAÇÃO ===================== */
+function showView(view){
+  currentView = view;
+  document.getElementById('view-dashboard').style.display = view==='dashboard' ? 'block':'none';
+  document.getElementById('view-project').style.display = view==='project' ? 'block':'none';
+  document.getElementById('view-catalogo').style.display = view==='catalogo' ? 'block':'none';
+  document.getElementById('bottomnav').classList.toggle('flex-show', view==='project');
+  if(view==='dashboard') renderDashboard();
+  if(view==='catalogo') renderCatalogo();
+  renderTopbar();
+}
+function renderTopbar(){
+  const back=document.getElementById('btnBack'), save=document.getElementById('btnSave'), title=document.getElementById('topTitle');
+  if(currentView==='dashboard'){ back.style.display='none'; save.style.display='none'; title.textContent='🪚 Marcenaria'; }
+  else if(currentView==='catalogo'){ back.style.display='inline-block'; save.style.display='none'; title.textContent='Catálogo de materiais'; }
+  else if(currentView==='project'){
+    back.style.display='inline-block'; save.style.display='inline-block';
+    const p=getProjeto(currentProjectId); title.textContent = p ? p.projetoNome : 'Orçamento';
+  }
+}
+function goBack(){
+  if(currentView==='catalogo' && catalogOrigemProjectId){ const id=catalogOrigemProjectId; catalogOrigemProjectId=null; openProject(id); }
+  else { showView('dashboard'); }
+}
+function openProject(id){ currentProjectId=id; currentTab='orcamento'; showView('project'); switchTab('orcamento'); }
+function switchTab(tab){
+  currentTab = tab;
+  document.querySelectorAll('.tab-content').forEach(el=> el.style.display='none');
+  document.getElementById('tab-'+tab).style.display='block';
+  renderTab(tab);
+  document.querySelectorAll('#bottomnav .navbtn').forEach(b=> b.classList.toggle('active', b.dataset.tab===tab));
+}
+function renderTab(tab){
+  if(tab==='orcamento') renderTabOrcamento();
+  else if(tab==='materiais') renderTabMateriais();
+  else if(tab==='pecas') renderTabPecas();
+  else if(tab==='corte') renderTabCorte();
+  else if(tab==='resumo') renderTabResumo();
+}
+
+/* ===================== DASHBOARD ===================== */
+function renderDashboard(){
+  const lista = document.getElementById('listaProjetos');
+  const ordenados = DB.projetos.slice().sort((a,b)=>b.atualizadoEm-a.atualizadoEm);
+  lista.innerHTML = ordenados.length ? ordenados.map(p=>{
+    const totals = calcularOrcamento(p);
+    return `<div class="card">
+      <div class="card-main" data-action="abrir-projeto" data-id="${p.id}" style="cursor:pointer">
+        <strong>${esc(p.projetoNome)}</strong>
+        <span>${esc(p.cliente||'Sem cliente')}</span>
+        <span class="price">${fmtMoney(totals.precoFinal)}</span>
+      </div>
+      <div class="card-actions">
+        <button data-action="duplicar-projeto" data-id="${p.id}" title="Duplicar">⧉</button>
+        <button data-action="excluir-projeto" data-id="${p.id}" title="Excluir">🗑</button>
+      </div>
+    </div>`;
+  }).join('') : '<p class="empty">Nenhum orçamento ainda. Toque em "Novo Orçamento" para começar.</p>';
+  document.getElementById('statOrcamentos').textContent = DB.projetos.length;
+  document.getElementById('statClientes').textContent = new Set(DB.projetos.map(p=>p.cliente).filter(Boolean)).size;
+  document.getElementById('statUltimo').textContent = DB.projetos.length ? 'Recente' : '-';
+}
+
+/* ===================== ABA ORÇAMENTO ===================== */
+function renderTabOrcamento(){
+  const p = getProjeto(currentProjectId);
+  document.getElementById('tab-orcamento').innerHTML = `
+  <h2>Dados do orçamento</h2>
+  <div class="form-card">
+    <label>Cliente<input type="text" data-field="cliente" value="${esc(p.cliente)}" placeholder="Nome do cliente"></label>
+    <label>Nome do projeto<input type="text" data-field="projetoNome" value="${esc(p.projetoNome)}" placeholder="Ex: Armário de quarto"></label>
+    <div class="row2">
+      <label>Data<input type="date" data-field="data" value="${p.data}"></label>
+      <label>Prazo estimado<input type="text" data-field="prazo" value="${esc(p.prazo)}" placeholder="Ex: 15 dias"></label>
+    </div>
+    <label>Observações<textarea data-field="observacoes" placeholder="Observações gerais">${esc(p.observacoes)}</textarea></label>
+  </div>
+  <h2>Mão de obra</h2>
+  <div class="form-card">
+    <div class="switch-group">
+      <button class="chip ${p.maoDeObra.modo==='fixo'?'active':''}" data-action="modo-mao-obra" data-modo="fixo">Valor fixo</button>
+      <button class="chip ${p.maoDeObra.modo==='horas'?'active':''}" data-action="modo-mao-obra" data-modo="horas">Por horas</button>
+    </div>
+    ${p.maoDeObra.modo==='fixo' ? `
+      <label>Valor da mão de obra (R$)<input type="number" inputmode="decimal" step="0.01" data-field="maoDeObra.valorFixo" value="${p.maoDeObra.valorFixo}"></label>
+    ` : `
+      <label>Valor da hora (R$)<input type="number" inputmode="decimal" step="0.01" data-field="maoDeObra.valorHora" value="${p.maoDeObra.valorHora}"></label>
+      <div class="row2">
+        <label>Horas de projeto<input type="number" inputmode="decimal" step="0.5" data-field="maoDeObra.horasProjeto" value="${p.maoDeObra.horasProjeto}"></label>
+        <label>Horas de corte<input type="number" inputmode="decimal" step="0.5" data-field="maoDeObra.horasCorte" value="${p.maoDeObra.horasCorte}"></label>
+      </div>
+      <div class="row2">
+        <label>Horas de montagem<input type="number" inputmode="decimal" step="0.5" data-field="maoDeObra.horasMontagem" value="${p.maoDeObra.horasMontagem}"></label>
+        <label>Horas de instalação<input type="number" inputmode="decimal" step="0.5" data-field="maoDeObra.horasInstalacao" value="${p.maoDeObra.horasInstalacao}"></label>
+      </div>
+    `}
+  </div>
+  <h2>Custos adicionais</h2>
+  <div class="form-card">
+    <div class="row2">
+      <label>Transporte (R$)<input type="number" inputmode="decimal" step="0.01" data-field="custosAdicionais.transporte" value="${p.custosAdicionais.transporte}"></label>
+      <label>Instalação (R$)<input type="number" inputmode="decimal" step="0.01" data-field="custosAdicionais.instalacao" value="${p.custosAdicionais.instalacao}"></label>
+    </div>
+    <label>Outros custos (R$)<input type="number" inputmode="decimal" step="0.01" data-field="custosAdicionais.outros" value="${p.custosAdicionais.outros}"></label>
+    <label>Perda adicional de MDF (%)<input type="number" inputmode="decimal" step="1" data-field="perdaPercentual" value="${p.perdaPercentual}"></label>
+  </div>
+  <h2>Precificação</h2>
+  <div class="form-card">
+    <div class="switch-group">
+      <button class="chip ${p.precificacao.metodo==='margem'?'active':''}" data-action="modo-preco" data-modo="margem">Margem %</button>
+      <button class="chip ${p.precificacao.metodo==='multiplicador'?'active':''}" data-action="modo-preco" data-modo="multiplicador">Multiplicador</button>
+    </div>
+    ${p.precificacao.metodo==='margem'
+      ? `<label>Margem desejada (%)<input type="number" inputmode="decimal" step="1" data-field="precificacao.margem" value="${p.precificacao.margem}"></label>`
+      : `<label>Multiplicador<input type="number" inputmode="decimal" step="0.1" data-field="precificacao.multiplicador" value="${p.precificacao.multiplicador}"></label>`}
+    <label>Arredondar preço final
+      <select data-field="precificacao.arredondamento">
+        <option value="nao" ${p.precificacao.arredondamento==='nao'?'selected':''}>Não arredondar</option>
+        <option value="cima" ${p.precificacao.arredondamento==='cima'?'selected':''}>Arredondar para cima (múltiplo de R$ 50)</option>
+      </select>
+    </label>
+  </div>
+  <button class="btn btn-primary btn-block" data-action="salvar-projeto">💾 Salvar orçamento</button>`;
+}
+
+/* ===================== ABA MATERIAIS ===================== */
+function renderTabMateriais(){
+  const p = getProjeto(currentProjectId);
+  const chapaSel = DB.chapas.find(c=>c.id===p.chapaId);
+  document.getElementById('tab-materiais').innerHTML = `
+  <h2>Chapa de MDF usada neste orçamento</h2>
+  <div class="form-card">
+    <label>Chapa
+      <select data-field="chapaId" data-rerender="true">
+        <option value="">Selecione...</option>
+        ${DB.chapas.map(c=>`<option value="${c.id}" ${c.id===p.chapaId?'selected':''}>${esc(c.nome)} (${c.largura}×${c.comprimento}mm)</option>`).join('')}
+      </select>
+    </label>
+    ${chapaSel ? `<div class="info-box">
+      <div><strong>${esc(chapaSel.nome)}</strong> — ${chapaSel.largura} × ${chapaSel.comprimento} mm (${chapaSel.espessura}mm)</div>
+      <div>Preço: ${fmtMoney(chapaSel.preco)} · Kerf: ${chapaSel.kerf}mm · Margem: ${chapaSel.margem}mm</div>
+    </div>` : '<p class="empty">Nenhuma chapa selecionada.</p>'}
+    <button class="btn btn-secondary btn-block" data-action="ir-catalogo">🗄️ Gerenciar catálogo de chapas e preços</button>
+  </div>
+  <h2>Materiais extras (fita, ferragens, outros)</h2>
+  <button class="btn btn-primary btn-block" data-action="novo-material-extra">+ Adicionar material</button>
+  <div class="card-list">
+    ${(p.materiaisExtras||[]).length ? p.materiaisExtras.map(m=>`
+      <div class="card">
+        <div class="card-main">
+          <strong>${esc(m.nome)}</strong>
+          <span class="tag">${esc(m.tipo)}</span>
+          <span>${m.quantidade} ${esc(m.unidade)} × ${fmtMoney(m.precoUnit)} = <strong>${fmtMoney(m.quantidade*m.precoUnit)}</strong></span>
+        </div>
+        <div class="card-actions">
+          <button data-action="editar-material-extra" data-id="${m.id}">✎</button>
+          <button data-action="excluir-material-extra" data-id="${m.id}">🗑</button>
+        </div>
+      </div>`).join('') : '<p class="empty">Nenhum material extra adicionado.</p>'}
+  </div>`;
+}
+
+/* ===================== ABA PEÇAS ===================== */
+function renderTabPecas(){
+  const p = getProjeto(currentProjectId);
+  document.getElementById('tab-pecas').innerHTML = `
+  <h2>Peças do projeto</h2>
+  <button class="btn btn-primary btn-block" data-action="nova-peca">+ Adicionar peça</button>
+  <div class="card-list">
+    ${p.pecas.length ? p.pecas.map(pc=>`
+      <div class="card">
+        <div class="card-main">
+          <strong>${esc(pc.nome)} ${pc.codigo?`<small>(${esc(pc.codigo)})</small>`:''}</strong>
+          <span>${pc.largura} × ${pc.comprimento} mm · Qtd: ${pc.quantidade}</span>
+          <span class="tag">${pc.podeGirar? 'Pode girar' : 'Não gira'}${pc.espessura?(' · '+pc.espessura+'mm'):''}</span>
+          ${pc.observacao? `<span class="obs">${esc(pc.observacao)}</span>`:''}
+        </div>
+        <div class="card-actions">
+          <button data-action="editar-peca" data-id="${pc.id}">✎</button>
+          <button data-action="duplicar-peca" data-id="${pc.id}">⧉</button>
+          <button data-action="excluir-peca" data-id="${pc.id}">🗑</button>
+        </div>
+      </div>`).join('') : '<p class="empty">Nenhuma peça cadastrada ainda.</p>'}
+  </div>
+  ${p.pecas.length ? `<div class="info-box">Total de peças: ${p.pecas.reduce((s,pc)=>s+Number(pc.quantidade||0),0)}</div>` : ''}`;
+}
+
+/* ===================== ABA CORTE ===================== */
+function renderTabCorte(){
+  const p = getProjeto(currentProjectId);
+  const chapa = DB.chapas.find(c=>c.id===p.chapaId);
+  let html = `<h2>Cálculo de chapas e plano de corte</h2>`;
+  if(!chapa){ html += '<p class="alert">⚠ Selecione uma chapa de MDF na aba Materiais antes de calcular.</p>'; }
+  else if(!p.pecas.length){ html += '<p class="alert">⚠ Cadastre ao menos uma peça na aba Peças.</p>'; }
+  else { html += `<button class="btn btn-primary btn-block" data-action="calcular-corte">📐 Calcular plano de corte</button>`; }
+  if(p.corteResultado && chapa){
+    const r = p.corteResultado;
+    html += `<div class="info-box highlight"><div><strong>${r.sheets.length}</strong> chapa(s) necessária(s)</div><div>Aproveitamento geométrico: ${r.aproveitamento.toFixed(1)}%</div></div>`;
+    if(r.naoCabem && r.naoCabem.length){ html += `<p class="alert">⚠ ${r.naoCabem.length} peça(s) NÃO cabem na chapa selecionada: ${[...new Set(r.naoCabem.map(i=>esc(i.nome)))].join(', ')}</p>`; }
+    r.sheets.forEach((sheet, idx)=>{ html += renderSheetVisual(sheet, chapa, idx+1); });
+    html += `<h2>Lista de corte</h2>
+    <table class="print-table">
+      <tr><th>PEÇA</th><th>DIMENSÃO</th><th>QTD</th></tr>
+      ${p.pecas.map(pc=>`<tr><td>${esc(pc.nome)}</td><td>${pc.largura} × ${pc.comprimento}</td><td>${pc.quantidade}</td></tr>`).join('')}
+    </table>
+    <button class="btn btn-secondary btn-block" data-action="exportar-lista-corte-pdf">📄 Exportar lista de corte em PDF</button>`;
+  }
+  document.getElementById('tab-corte').innerHTML = html;
+}
+function renderSheetVisual(sheet, chapa, numero){
+  const margem = Number(chapa.margem)||0;
+  const usableW = chapa.largura - 2*margem;
+  const usableH = chapa.comprimento - 2*margem;
+  const marginLeft = (margem/chapa.largura*100).toFixed(3);
+  const marginTop = (margem/chapa.comprimento*100).toFixed(3);
+  const marginW = (usableW/chapa.largura*100).toFixed(3);
+  const marginH = (usableH/chapa.comprimento*100).toFixed(3);
+  const piecesHTML = sheet.placements.map(pl=>{
+    const left = ((margem+pl.x)/chapa.largura*100).toFixed(3);
+    const top = ((margem+pl.y)/chapa.comprimento*100).toFixed(3);
+    const w = (pl.w/chapa.largura*100).toFixed(3);
+    const h = (pl.h/chapa.comprimento*100).toFixed(3);
+    return `<div class="peca-box" style="left:${left}%;top:${top}%;width:${w}%;height:${h}%;background:${pieceColor(pl.nome)};">
+      <span class="peca-nome">${esc(pl.nome)}${pl.rotated?' ↻':''}</span>
+      <span class="peca-dim">${pl.w}×${pl.h}</span>
+      ${pl.codigo? `<span class="peca-cod">${esc(pl.codigo)}</span>` : ''}
+    </div>`;
+  }).join('');
+  const sobra = calcSobra(sheet, chapa);
+  return `<div class="sheet-block">
+    <h3>CHAPA ${numero} <small>${chapa.largura} × ${chapa.comprimento} mm</small></h3>
+    <div class="sheet-visual" style="aspect-ratio:${chapa.largura}/${chapa.comprimento}">
+      <div class="sheet-margin-line" style="left:${marginLeft}%;top:${marginTop}%;width:${marginW}%;height:${marginH}%;"></div>
+      ${piecesHTML}
+    </div>
+    <div class="sobra-info">Sobra aproximada: ${Math.round(sobra.w)} × ${Math.round(sobra.h)} mm — Aproveitável: <strong>${sobra.aproveitavel?'SIM':'NÃO'}</strong></div>
+  </div>`;
+}
+
+/* ===================== ABA RESUMO ===================== */
+function renderTabResumo(){
+  const p = getProjeto(currentProjectId);
+  const totals = calcularOrcamento(p);
+  const alertas = gerarAlertas(p, totals);
+  document.getElementById('tab-resumo').innerHTML = `
+  <h2>Resumo do orçamento</h2>
+  <div class="resumo-card">
+    <div class="resumo-line"><span>Materiais (MDF + extras)</span><span>${fmtMoney(totals.materiaisTotal)}</span></div>
+    <div class="resumo-sub">MDF: ${fmtMoney(totals.custoMDF)} (${totals.sheetsUsed} chapa(s)) · Extras: ${fmtMoney(totals.materiaisExtrasTotal)}</div>
+    <div class="resumo-line"><span>Mão de obra</span><span>${fmtMoney(totals.maoObraTotal)}</span></div>
+    <div class="resumo-line"><span>Custos adicionais</span><span>${fmtMoney(totals.custosAdic)}</span></div>
+    <hr>
+    <div class="resumo-line total"><span>CUSTO TOTAL</span><span>${fmtMoney(totals.custoTotal)}</span></div>
+    <div class="resumo-sub">${p.precificacao.metodo==='margem' ? ('Margem: '+p.precificacao.margem+'%') : ('Multiplicador: '+p.precificacao.multiplicador+'x')}${p.precificacao.arredondamento==='cima' ? ' · Arredondado para cima':''}</div>
+    <div class="preco-venda-box"><span>PREÇO DE VENDA</span><strong>${fmtMoney(totals.precoFinal)}</strong></div>
+    <div class="resumo-line"><span>Lucro estimado</span><span>${fmtMoney(totals.lucro)}</span></div>
+    ${totals.sheetsUsed ? `<div class="resumo-sub">Aproveitamento geométrico: ${totals.aproveitamento.toFixed(1)}% · Perda adicional considerada: ${p.perdaPercentual}%</div>` : ''}
+  </div>
+  ${alertas.map(a=>`<p class="alert">⚠ ${esc(a)}</p>`).join('')}
+  <button class="btn btn-primary btn-block" data-action="exportar-orcamento-pdf">📄 Exportar orçamento em PDF</button>
+  <button class="btn btn-secondary btn-block" data-action="salvar-projeto">💾 Salvar orçamento</button>`;
+}
+
+/* ===================== CATÁLOGO GLOBAL ===================== */
+function renderCatalogo(){
+  document.getElementById('view-catalogo').innerHTML = `
+  <h2>Chapas de MDF cadastradas</h2>
+  <button class="btn btn-primary btn-block" data-action="nova-chapa">+ Nova chapa</button>
+  <div class="card-list">
+    ${DB.chapas.map(c=>`
+      <div class="card">
+        <div class="card-main">
+          <strong>${esc(c.nome)}</strong>
+          <span>${c.largura} × ${c.comprimento} mm · ${c.espessura}mm</span>
+          <span>${fmtMoney(c.preco)} · Kerf ${c.kerf}mm · Margem ${c.margem}mm</span>
+        </div>
+        <div class="card-actions">
+          <button data-action="editar-chapa" data-id="${c.id}">✎</button>
+          <button data-action="excluir-chapa" data-id="${c.id}">🗑</button>
+        </div>
+      </div>`).join('') || '<p class="empty">Nenhuma chapa cadastrada.</p>'}
+  </div>
+  <h2>Banco de preços (fita, ferragens, outros)</h2>
+  <button class="btn btn-primary btn-block" data-action="novo-preco">+ Novo item</button>
+  <div class="card-list">
+    ${DB.precos.map(i=>`
+      <div class="card">
+        <div class="card-main">
+          <strong>${esc(i.nome)}</strong>
+          <span>${fmtMoney(i.preco)} / ${esc(i.unidade)} · ${esc(i.tipo)}</span>
+        </div>
+        <div class="card-actions">
+          <button data-action="editar-preco" data-id="${i.id}">✎</button>
+          <button data-action="excluir-preco" data-id="${i.id}">🗑</button>
+        </div>
+      </div>`).join('') || '<p class="empty">Nenhum item cadastrado.</p>'}
+  </div>`;
+}
+
+/* ===================== MODAL GENÉRICO (formulários) ===================== */
+function showModal(opts){
+  const root = document.getElementById('modal-root');
+  const fieldsHTML = opts.fields.map(f=>{
+    if(f.type==='checkbox'){ return `<label class="field-check"><input type="checkbox" id="mf_${f.name}" ${f.value?'checked':''}> ${f.label}</label>`; }
+    else if(f.type==='select'){
+      const optsHTML = f.options.map(o=>`<option value="${o.value}" ${String(o.value)===String(f.value)?'selected':''}>${esc(o.label)}</option>`).join('');
+      return `<label>${f.label}<select id="mf_${f.name}">${optsHTML}</select></label>`;
+    } else if(f.type==='textarea'){ return `<label>${f.label}<textarea id="mf_${f.name}" placeholder="${esc(f.placeholder||'')}">${esc(f.value||'')}</textarea></label>`; }
+    else { return `<label>${f.label}<input type="${f.type||'text'}" id="mf_${f.name}" value="${f.value??''}" ${f.step?`step="${f.step}"`:''} ${f.type==='number'?'inputmode="decimal"':''} placeholder="${esc(f.placeholder||'')}"></label>`; }
+  }).join('');
+  root.innerHTML = `<div class="modal-overlay" data-action="fechar-modal">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h3>${esc(opts.title)}</h3>
+      <div class="modal-form">${fieldsHTML}</div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" data-action="fechar-modal">Cancelar</button>
+        <button class="btn btn-primary" id="modalSaveBtn">Salvar</button>
+      </div>
+    </div>
+  </div>`;
+  if(typeof opts.afterRender === 'function') opts.afterRender(root);
+  document.getElementById('modalSaveBtn').onclick = ()=>{
+    const values = {};
+    opts.fields.forEach(f=>{
+      const el = document.getElementById('mf_'+f.name);
+      if(f.type==='checkbox') values[f.name] = el.checked;
+      else if(f.type==='number') values[f.name] = el.value===''? 0 : parseFloat(String(el.value).replace(',','.'));
+      else values[f.name] = el.value;
+    });
+    const err = opts.validate ? opts.validate(values) : null;
+    if(err){ toast(err,'error'); return; }
+    closeModal();
+    opts.onSave(values);
+  };
+}
+function closeModal(){ document.getElementById('modal-root').innerHTML=''; }
+
+/* ===================== MODAL: EXPORTAÇÃO MANUAL (fallback do JSON) ===================== */
+function showTextExportModal(title, content, suggestedFilename){
+  const root = document.getElementById('modal-root');
+  root.innerHTML = `<div class="modal-overlay" data-action="fechar-modal">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h3>${esc(title)}</h3>
+      <p>Não foi possível baixar o arquivo automaticamente neste navegador. Copie o conteúdo abaixo e salve manualmente como <strong>${esc(suggestedFilename)}</strong>:</p>
+      <textarea class="export-textarea" id="exportTextArea" readonly>${esc(content)}</textarea>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" data-action="fechar-modal">Fechar</button>
+        <button class="btn btn-primary" id="copyExportBtn">Copiar tudo</button>
+      </div>
+    </div>
+  </div>`;
+  const ta = document.getElementById('exportTextArea');
+  document.getElementById('copyExportBtn').onclick = ()=>{
+    ta.focus(); ta.select();
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(content); toast('Copiado! Cole em um arquivo de texto e salve.'); }
+      else { document.execCommand('copy'); toast('Copiado! Cole em um arquivo de texto e salve.'); }
+    }catch(e){ toast('Selecione o texto manualmente e copie.', 'error'); }
+  };
+}
+
+/* ===================== MODAL: PEÇA ===================== */
+function abrirModalPeca(id){
+  const p = getProjeto(currentProjectId);
+  const existing = id ? p.pecas.find(x=>x.id===id) : null;
+  showModal({
+    title: existing ? 'Editar peça' : 'Nova peça',
+    fields: [
+      { name:'nome', label:'Nome da peça', type:'text', value: existing?existing.nome:'' },
+      { name:'codigo', label:'Código (opcional)', type:'text', value: existing?existing.codigo:'' },
+      { name:'largura', label:'Largura (mm)', type:'number', value: existing?existing.largura:'' },
+      { name:'comprimento', label:'Comprimento (mm)', type:'number', value: existing?existing.comprimento:'' },
+      { name:'quantidade', label:'Quantidade', type:'number', value: existing?existing.quantidade:1 },
+      { name:'espessura', label:'Espessura (mm, opcional)', type:'number', value: existing?existing.espessura:'' },
+      { name:'podeGirar', label:'Pode girar (rotacionar) na chapa', type:'checkbox', value: existing? existing.podeGirar : true },
+      { name:'acabamento', label:'Acabamento (opcional)', type:'text', value: existing?existing.acabamento:'' },
+      { name:'observacao', label:'Observação', type:'textarea', value: existing?existing.observacao:'' }
+    ],
+    validate: v=>{
+      if(!v.nome || !String(v.nome).trim()) return 'Informe o nome da peça.';
+      if(!v.largura || v.largura<=0) return 'Largura inválida.';
+      if(!v.comprimento || v.comprimento<=0) return 'Comprimento inválido.';
+      if(!v.quantidade || v.quantidade<=0) return 'Quantidade deve ser maior que zero.';
+      return null;
+    },
+    onSave: v=>{
+      if(existing){ Object.assign(existing, v); } else { p.pecas.push({ id:uid(), ...v }); }
+      p.corteResultado = null; p.atualizadoEm = Date.now(); saveDB();
+      renderTab('pecas'); toast('Peça salva!');
+    }
+  });
+}
+function duplicarPeca(id){
+  const p = getProjeto(currentProjectId);
+  const orig = p.pecas.find(x=>x.id===id); if(!orig) return;
+  p.pecas.push({ ...orig, id:uid(), nome:orig.nome+' (cópia)' });
+  p.corteResultado = null; p.atualizadoEm = Date.now(); saveDB();
+  renderTab('pecas'); toast('Peça duplicada!');
+}
+function excluirPeca(id){
+  const p = getProjeto(currentProjectId);
+  p.pecas = p.pecas.filter(x=>x.id!==id);
+  p.corteResultado = null; p.atualizadoEm = Date.now(); saveDB();
+  renderTab('pecas'); toast('Peça excluída.');
+}
+
+/* ===================== MODAL: MATERIAL EXTRA ===================== */
+function abrirModalMaterialExtra(id){
+  const p = getProjeto(currentProjectId);
+  const existing = id ? p.materiaisExtras.find(x=>x.id===id) : null;
+  const catalogOptions = [{value:'', label:'— Selecionar do catálogo (opcional) —'}].concat(
+    DB.precos.map(i=>({value:i.id, label:i.nome+' - '+fmtMoney(i.preco)+'/'+i.unidade}))
+  );
+  showModal({
+    title: existing ? 'Editar material' : 'Novo material',
+    fields: [
+      { name:'catalogoId', label:'Selecionar do catálogo', type:'select', options: catalogOptions, value:'' },
+      { name:'nome', label:'Nome do material', type:'text', value: existing?existing.nome:'' },
+      { name:'tipo', label:'Tipo', type:'select', options:[
+          {value:'fita',label:'Fita de borda'},{value:'ferragem',label:'Ferragem'},{value:'acessorio',label:'Acessório'},{value:'outro',label:'Outro'}
+        ], value: existing?existing.tipo:'ferragem' },
+      { name:'quantidade', label:'Quantidade', type:'number', value: existing?existing.quantidade:1 },
+      { name:'unidade', label:'Unidade (un, m, kg...)', type:'text', value: existing?existing.unidade:'un' },
+      { name:'precoUnit', label:'Preço unitário (R$)', type:'number', step:'0.01', value: existing?existing.precoUnit:0 }
+    ],
+    afterRender: (root)=>{
+      const sel = root.querySelector('#mf_catalogoId');
+      sel.addEventListener('change', ()=>{
+        const item = DB.precos.find(i=>i.id===sel.value);
+        if(item){
+          root.querySelector('#mf_nome').value = item.nome;
+          root.querySelector('#mf_unidade').value = item.unidade;
+          root.querySelector('#mf_precoUnit').value = item.preco;
+          root.querySelector('#mf_tipo').value = item.tipo;
+        }
+      });
+    },
+    validate: v=>{
+      if(!v.nome || !String(v.nome).trim()) return 'Informe o nome do material.';
+      if(!v.quantidade || v.quantidade<=0) return 'Quantidade inválida.';
+      if(v.precoUnit<0) return 'Preço inválido.';
+      return null;
+    },
+    onSave: v=>{
+      delete v.catalogoId;
+      if(existing){ Object.assign(existing, v); } else { p.materiaisExtras.push({ id:uid(), ...v }); }
+      p.atualizadoEm = Date.now(); saveDB();
+      renderTab('materiais'); toast('Material salvo!');
+    }
+  });
+}
+function excluirMaterialExtra(id){
+  const p = getProjeto(currentProjectId);
+  p.materiaisExtras = p.materiaisExtras.filter(x=>x.id!==id);
+  p.atualizadoEm = Date.now(); saveDB();
+  renderTab('materiais'); toast('Material excluído.');
+}
+
+/* ===================== MODAL: CHAPA ===================== */
+function abrirModalChapa(id){
+  const existing = id ? DB.chapas.find(x=>x.id===id) : null;
+  showModal({
+    title: existing ? 'Editar chapa' : 'Nova chapa de MDF',
+    fields: [
+      { name:'nome', label:'Nome/cor/modelo', type:'text', value: existing?existing.nome:'' },
+      { name:'largura', label:'Largura (mm)', type:'number', value: existing?existing.largura:1850 },
+      { name:'comprimento', label:'Comprimento (mm)', type:'number', value: existing?existing.comprimento:2750 },
+      { name:'espessura', label:'Espessura (mm)', type:'number', value: existing?existing.espessura:15 },
+      { name:'preco', label:'Preço da chapa (R$)', type:'number', step:'0.01', value: existing?existing.preco:0 },
+      { name:'kerf', label:'Kerf da serra (mm)', type:'number', step:'0.1', value: existing?existing.kerf:3.2 },
+      { name:'margem', label:'Margem de segurança nas bordas (mm)', type:'number', value: existing?existing.margem:5 },
+      { name:'qtdDisponivel', label:'Quantidade disponível (opcional)', type:'number', value: existing?existing.qtdDisponivel:'' }
+    ],
+    validate: v=>{
+      if(!v.nome || !String(v.nome).trim()) return 'Informe o nome da chapa.';
+      if(!v.largura || v.largura<=0 || !v.comprimento || v.comprimento<=0) return 'Dimensões da chapa inválidas.';
+      if(v.preco<0) return 'Preço inválido.';
+      return null;
+    },
+    onSave: v=>{
+      if(existing){ Object.assign(existing, v); } else { DB.chapas.push({ id:uid(), ...v }); }
+      saveDB(); renderCatalogo(); toast('Chapa salva!');
+    }
+  });
+}
+function excluirChapa(id){ DB.chapas = DB.chapas.filter(x=>x.id!==id); saveDB(); renderCatalogo(); toast('Chapa excluída.'); }
+
+/* ===================== MODAL: BANCO DE PREÇOS ===================== */
+function abrirModalPreco(id){
+  const existing = id ? DB.precos.find(x=>x.id===id) : null;
+  showModal({
+    title: existing ? 'Editar item de preço' : 'Novo item de preço',
+    fields: [
+      { name:'nome', label:'Nome do item', type:'text', value: existing?existing.nome:'' },
+      { name:'tipo', label:'Tipo', type:'select', options:[
+          {value:'fita',label:'Fita de borda'},{value:'ferragem',label:'Ferragem'},{value:'acessorio',label:'Acessório'},{value:'outro',label:'Outro'}
+        ], value: existing?existing.tipo:'ferragem' },
+      { name:'preco', label:'Preço (R$)', type:'number', step:'0.01', value: existing?existing.preco:0 },
+      { name:'unidade', label:'Unidade (un, m, kg...)', type:'text', value: existing?existing.unidade:'un' }
+    ],
+    validate: v=>{
+      if(!v.nome || !String(v.nome).trim()) return 'Informe o nome do item.';
+      if(v.preco<0) return 'Preço inválido.';
+      return null;
+    },
+    onSave: v=>{
+      if(existing){ Object.assign(existing, v); } else { DB.precos.push({ id:uid(), ...v }); }
+      saveDB(); renderCatalogo(); toast('Item salvo!');
+    }
+  });
+}
+function excluirPreco(id){ DB.precos = DB.precos.filter(x=>x.id!==id); saveDB(); renderCatalogo(); toast('Item excluído.'); }
+
+/* ===================== CARREGAR EXEMPLO ===================== */
+function carregarExemplo(){
+  let chapa = DB.chapas.find(c=>c.nome.includes('15mm')) || DB.chapas[0];
+  if(!chapa){
+    chapa = { id:uid(), nome:'MDF Branco 15mm', largura:1850, comprimento:2750, espessura:15, preco:185, kerf:3.2, margem:5, qtdDisponivel:'' };
+    DB.chapas.push(chapa); saveDB();
+  }
+  const p = novoProjeto();
+  p.cliente = 'Cliente Exemplo';
+  p.projetoNome = 'Armário Exemplo';
+  p.chapaId = chapa.id;
+  p.pecas = [
+    { id:uid(), nome:'Lateral', codigo:'P1', largura:600, comprimento:700, quantidade:2, espessura:15, podeGirar:true, observacao:'' },
+    { id:uid(), nome:'Tampo', codigo:'P2', largura:1200, comprimento:600, quantidade:1, espessura:15, podeGirar:true, observacao:'' },
+    { id:uid(), nome:'Prateleira', codigo:'P3', largura:550, comprimento:300, quantidade:3, espessura:15, podeGirar:true, observacao:'' },
+    { id:uid(), nome:'Fundo', codigo:'P4', largura:800, comprimento:500, quantidade:1, espessura:15, podeGirar:true, observacao:'' },
+    { id:uid(), nome:'Divisória', codigo:'P5', largura:400, comprimento:500, quantidade:2, espessura:15, podeGirar:true, observacao:'' }
+  ];
+  p.materiaisExtras = [
+    { id:uid(), nome:'Dobradiça', tipo:'ferragem', quantidade:8, unidade:'un', precoUnit:7.5 },
+    { id:uid(), nome:'Fita de borda 22mm', tipo:'fita', quantidade:15, unidade:'m', precoUnit:1.8 }
+  ];
+  p.maoDeObra.modo='fixo'; p.maoDeObra.valorFixo=300;
+  p.custosAdicionais.transporte = 50;
+  p.corteResultado = packPieces(p.pecas, chapa);
+  saveDB();
+  openProject(p.id);
+  toast('Exemplo carregado!');
+}
+
+/* ===================== IMPRESSÃO / EXPORTAÇÃO PDF =====================
+   IMPORTANTE: não usar window.open() aqui. No iPhone/Safari, abrir uma
+   nova janela para imprimir faz o iOS tratar o conteúdo como um documento
+   solto e abri-lo no app Arquivos, sem a opção de escolher Safari/Chrome.
+   A solução confiável é montar o conteúdo dentro da própria página
+   (#print-area, já oculta) e chamar window.print() ali mesmo. As regras
+   @media print do CSS principal escondem todo o resto da interface.
+========================================================= */
+function gerarConteudoOrcamento(p, totals){
+  return `
+    <h2>MARCENARIA — ORÇAMENTO</h2>
+    <div class="print-row"><span>Cliente:</span><strong>${esc(p.cliente||'-')}</strong></div>
+    <div class="print-row"><span>Projeto:</span><strong>${esc(p.projetoNome||'-')}</strong></div>
+    <div class="print-row"><span>Data:</span><strong>${fmtDate(p.data)}</strong></div>
+    ${p.prazo? `<div class="print-row"><span>Prazo:</span><strong>${esc(p.prazo)}</strong></div>`:''}
+    <hr>
+    <h3>MATERIAIS</h3>
+    <div class="print-row"><span>MDF (${totals.sheetsUsed} chapa(s))</span><span>${fmtMoney(totals.custoMDF)}</span></div>
+    ${(p.materiaisExtras||[]).map(m=>`<div class="print-row"><span>${esc(m.nome)} (${m.quantidade} ${esc(m.unidade)})</span><span>${fmtMoney(m.quantidade*m.precoUnit)}</span></div>`).join('')}
+    <hr>
+    <h3>MÃO DE OBRA</h3>
+    <div class="print-row"><span>Mão de obra</span><span>${fmtMoney(totals.maoObraTotal)}</span></div>
+    <h3>CUSTOS ADICIONAIS</h3>
+    <div class="print-row"><span>Transporte / Instalação / Outros</span><span>${fmtMoney(totals.custosAdic)}</span></div>
+    <hr>
+    <div class="print-row print-total destaque"><span>CUSTO TOTAL</span><span>${fmtMoney(totals.custoTotal)}</span></div>
+    <div class="print-row print-total destaque"><span>PREÇO DE VENDA</span><span>${fmtMoney(totals.precoFinal)}</span></div>
+    <hr>
+    <h3>LISTA DE PEÇAS</h3>
+    <table class="print-table">
+      <tr><th>Peça</th><th>Dimensão</th><th>Qtd</th></tr>
+      ${p.pecas.map(pc=>`<tr><td>${esc(pc.nome)}</td><td>${pc.largura} × ${pc.comprimento}</td><td>${pc.quantidade}</td></tr>`).join('')}
+    </table>
+    <h3>PLANO DE CORTE</h3>
+    <p>${totals.sheetsUsed} chapa(s) de MDF necessária(s). Aproveitamento geométrico: ${totals.aproveitamento.toFixed(1)}%.</p>
+    ${p.observacoes? `<h3>OBSERVAÇÕES</h3><p>${esc(p.observacoes)}</p>` : ''}
+  `;
+}
+function gerarConteudoListaCorte(p){
+  return `
+    <h2>LISTA DE CORTE</h2>
+    <div class="print-row"><span>Projeto:</span><strong>${esc(p.projetoNome||'-')}</strong></div>
+    <div class="print-row"><span>Cliente:</span><strong>${esc(p.cliente||'-')}</strong></div>
+    <table class="print-table">
+      <tr><th>PEÇA</th><th>DIMENSÃO (mm)</th><th>QTD</th></tr>
+      ${p.pecas.map(pc=>`<tr><td>${esc(pc.nome)}</td><td>${pc.largura} × ${pc.comprimento}</td><td>${pc.quantidade}</td></tr>`).join('')}
+    </table>
+  `;
+}
+function imprimirConteudo(bodyHTML){
+  const printArea = document.getElementById('print-area');
+  printArea.innerHTML = `
+    <style>
+      @page{ size:A4; margin:12mm; }
+      #print-area{ font-family:-apple-system,Arial,sans-serif; }
+      #print-area h2{ margin:0 0 10px 0; }
+      #print-area h3{ margin:14px 0 6px 0; }
+      #print-area hr{ border:none;border-top:1px solid #999;margin:10px 0; }
+    </style>
+    ${bodyHTML}
+  `;
+  setTimeout(()=>{
+    try{
+      window.print();
+      toast('Na tela de impressão, toque em Compartilhar e depois em "Salvar em Arquivos" (ou escolha Salvar como PDF).');
+    }catch(e){
+      toast('Não foi possível abrir a impressão neste navegador.', 'error');
+    }
+  }, 200);
+}
+function exportarOrcamentoPDF(){
+  const p = getProjeto(currentProjectId);
+  if(!p){ toast('Nenhum orçamento aberto.', 'error'); return; }
+  const totals = calcularOrcamento(p);
+  imprimirConteudo(gerarConteudoOrcamento(p, totals));
+}
+function exportarListaCortePDF(){
+  const p = getProjeto(currentProjectId);
+  if(!p){ toast('Nenhum orçamento aberto.', 'error'); return; }
+  imprimirConteudo(gerarConteudoListaCorte(p));
+}
+
+/* ===================== EVENTOS (DELEGAÇÃO) ===================== */
+document.addEventListener('click', (e)=>{
+  const btn = e.target.closest('[data-action]');
+  if(!btn) return;
+  const action = btn.dataset.action;
+  const id = btn.dataset.id;
+
+  switch(action){
+    case 'voltar': goBack(); break;
+    case 'salvar-projeto': salvarProjetoAtual(); break;
+    case 'novo-orcamento': { const p = novoProjeto(); openProject(p.id); break; }
+    case 'abrir-projeto': openProject(id); break;
+    case 'duplicar-projeto': duplicarProjeto(id); break;
+    case 'excluir-projeto': showConfirm('Excluir este orçamento? Essa ação não pode ser desfeita.', ()=>excluirProjeto(id)); break;
+    case 'carregar-exemplo': carregarExemplo(); break;
+    case 'ir-catalogo': catalogOrigemProjectId = currentView==='project'? currentProjectId : null; showView('catalogo'); break;
+    case 'switch-tab': switchTab(btn.dataset.tab); break;
+    case 'nova-peca': abrirModalPeca(null); break;
+    case 'editar-peca': abrirModalPeca(id); break;
+    case 'duplicar-peca': duplicarPeca(id); break;
+    case 'excluir-peca': showConfirm('Excluir esta peça?', ()=>excluirPeca(id)); break;
+    case 'novo-material-extra': abrirModalMaterialExtra(null); break;
+    case 'editar-material-extra': abrirModalMaterialExtra(id); break;
+    case 'excluir-material-extra': showConfirm('Excluir este material?', ()=>excluirMaterialExtra(id)); break;
+    case 'nova-chapa': abrirModalChapa(null); break;
+    case 'editar-chapa': abrirModalChapa(id); break;
+    case 'excluir-chapa': showConfirm('Excluir esta chapa do catálogo?', ()=>excluirChapa(id)); break;
+    case 'novo-preco': abrirModalPreco(null); break;
+    case 'editar-preco': abrirModalPreco(id); break;
+    case 'excluir-preco': showConfirm('Excluir este item do banco de preços?', ()=>excluirPreco(id)); break;
+    case 'calcular-corte': calcularECorte(); break;
+    case 'exportar-orcamento-pdf': exportarOrcamentoPDF(); break;
+    case 'exportar-lista-corte-pdf': exportarListaCortePDF(); break;
+    case 'fechar-modal': closeModal(); break;
+    case 'modo-mao-obra': { const p=getProjeto(currentProjectId); p.maoDeObra.modo=btn.dataset.modo; saveDB(); renderTab('orcamento'); break; }
+    case 'modo-preco': { const p=getProjeto(currentProjectId); p.precificacao.metodo=btn.dataset.modo; saveDB(); renderTab('orcamento'); break; }
+  }
+});
+
+
+
+function handleProjectFieldChange(el){
+  if(!el.dataset || !el.dataset.field) return;
+  if(!el.closest('#view-project')) return;
+  const p = getProjeto(currentProjectId); if(!p) return;
+  let value = el.value;
+  if(el.type==='number') value = value===''? '' : parseFloat(String(value).replace(',','.'));
+  setPath(p, el.dataset.field, value);
+  p.atualizadoEm = Date.now();
+  saveDB();
+  if(el.dataset.rerender==='true'){ p.corteResultado = null; renderTab(currentTab); }
+}
+document.addEventListener('input', (e)=>handleProjectFieldChange(e.target));
+document.addEventListener('change', (e)=>handleProjectFieldChange(e.target));
+
+/* ===================== INICIALIZAÇÃO ===================== */
+function registerOfflineApp(){
+  if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost')){
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  }
+}
+function initInstallInfo(){
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  const box=document.getElementById('install-info');
+  if(box && !standalone){ box.style.display='block'; }
+}
+function init(){ loadDB(); registerOfflineApp(); showView('dashboard'); initInstallInfo(); }
+init();
+</script>
+</body>
+</html>
