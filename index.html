@@ -1394,7 +1394,7 @@ document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState=
 /* ===================== INICIALIZAÇÃO ===================== */
 function registerOfflineApp(){
   if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost')){
-    navigator.serviceWorker.register('./sw.js?ver=3-offline-20260921').then(r=>r.update()).catch(()=>{});
+    navigator.serviceWorker.register('./sw.js?ver=3-offline-20260921-02').then(r=>r.update()).catch(()=>{});
   }
 }
 function initInstallInfo(){
